@@ -8,6 +8,7 @@ from todo_app.views.projects_view import ProjectsView
 from todo_app.views.tabs_view import TabsView
 
 
+
 # --- MAIN APPLICATION CLASS ---
 class App(ctk.CTk):
     """Main application class"""
@@ -16,11 +17,25 @@ class App(ctk.CTk):
         super().__init__()
 
         # --- DEFAULT WINDOW SETTINGS ---
-        # Window size
-        self.geometry("750x450")
+
         # Window title
-        self.iconbitmap("src/todo_app/assets/icon.ico")
+        self.iconbitmap("src/todo_app/assets/icon_main.ico")
         self.title("My To-Do manager")
+        
+        # Define the starting size of the main application
+        app_width = 750
+        app_height = 450
+
+        # Use normal Tkinter to get the monitor size
+        screen_width = self.winfo_screenwidth()
+        screen_height = self.winfo_screenheight()
+
+        # Get center of monitor
+        pos_x = (screen_width // 2) - (app_width // 2)
+        pos_y = (screen_height // 2) - (app_height // 2)
+
+        # Create window at the center of the screen by entering "<width>x<height>+<x_pos>+<y_pos>"
+        self.geometry(str(app_width)+"x"+str(app_height)+"+"+str(pos_x)+"+"+str(pos_y))
 
 
         # --- GRID SETTINGS ---

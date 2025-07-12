@@ -3,8 +3,13 @@
 import tkinter as tk
 import customtkinter as ctk
 from todo_app.ui import widgets as ui
+from todo_app.ui import themes
 
+# Import the main frame color for all frames
+from todo_app.ui.themes import MAIN_FRAME_COLOR
 
+# Get the settings for the default theme
+default_theme = themes.get_theme("default")
 
 
 # --- MAIN UI/LANDING "PAGE" CLASS ---
@@ -22,7 +27,7 @@ class ProjectsView(ctk.CTkFrame):
 
         # (Analogy: Add seats to the car chassi)
         defaults = {
-            "fg_color": "#066413"
+            "fg_color": MAIN_FRAME_COLOR
         }
 
         # Allow instantiation arguments to override the defaults
@@ -31,33 +36,47 @@ class ProjectsView(ctk.CTkFrame):
         # (Analogy: order the car chassi with the new specifications)
         super().__init__(master, **defaults)
 
+
+        self.grid_rowconfigure(0, weight=1)
+        self.grid_rowconfigure(1, weight=1)
+        self.grid_rowconfigure(2, weight=1)
+        self.grid_rowconfigure(3, weight=1)
+
+        self.grid_columnconfigure(0, weight=1)
+        self.grid_columnconfigure(1, weight=0)
+        self.grid_columnconfigure(2, weight=0)
+
+
         header = ctk.CTkLabel(master=self, text="My Test label")
         header.grid(row=0, column=0, padx=20, pady=20)
 
 
         test_button = ui.PrimaryButton(
             master = self,
-            text = "Switch to tabs view",
+            text = "Example project",
             # use 'lambda' to to create a mini/anonymous function, this
             # prevents the command from running when script is being executed/# application is started.
-            command = lambda: self.set_view("tabs")
+            command = lambda: self.set_view("tabs"),
+            theme = default_theme
         )
-        test_button.grid(row=0, column=0, padx=20, pady=20)
+        test_button.grid(row=1, column=0, padx=20, pady=20)
 
         button_add_project = ui.PrimaryButton(
             master = self,
             text = "Add project",
-            command = self.open_add_project
+            command = self.open_add_project,
+            theme = default_theme
         )
-        button_add_project.grid(row=1, column=3, padx=20, pady=20)
+        button_add_project.grid(row=2, column=0, padx=20, pady=20)
 
 
         button_print = ui.PrimaryButton(
             master = self,
             text = "Print button",
-            command = self.print
+            command = self.print,
+            theme = default_theme
         )
-        button_print.grid(row=2, column=0, padx=20, pady=20)
+        button_print.grid(row=3, column=0, padx=20, pady=20)
 
 
 
@@ -81,12 +100,17 @@ class ProjectsView(ctk.CTkFrame):
     # Open the "Add project" popup/dialog window
     def open_add_project(self):
         dialog = ctk.CTkInputDialog(
-            text="Project name:",
-            title="Add new project",
-            fg_color="#202020"
+            title = "Add new project",
+            text = "Project name:",
+            fg_color = MAIN_FRAME_COLOR,
+            button_fg_color = default_theme["button_fg_color"],
+            button_hover_color = default_theme["button_hover_color"]
         )
 
         # --- POSITIONING THE DIALOG ---
+
+        dialog.iconbitmap("D:/Projects/Programming/ToDoApp/src/todo_app/assets/icon_main.ico")
+
         # Makes sure the dialogs contents are fully arranged and ready before doing anything else.
         dialog.update_idletasks()
 
@@ -102,6 +126,11 @@ class ProjectsView(ctk.CTkFrame):
 
         # Set the dialog position
         dialog.geometry(f"+{pos_x}+{pos_y}")
+
+        # After 200 milliseconds, apply the icon to the window
+        # (Ctk applies its own after ~150ms so we have to wait until after that)
+        dialog.after(200, lambda: dialog.iconbitmap("D:/Projects/Programming/ToDoApp/src/todo_app/assets/icon_main.ico"))
+
 
 
         # --- END POSITIONING ---
