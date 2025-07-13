@@ -1,9 +1,6 @@
 import customtkinter as ctk
 from todo_app.ui import themes
 
-# Import the main frame color for all frames
-from todo_app.ui.themes import MAIN_FRAME_COLOR
-
 DEFAULT_THEME = "default"
 
 
@@ -26,9 +23,9 @@ class PrimaryButton(ctk.CTkButton):
             "width": 160,
             "font": ctk.CTkFont(size=14),
             "command": confirmation_print,
-            "fg_color": theme["button_fg_color"],
-            "hover_color": theme["button_hover_color"],
-            "text_color": theme["button_text_color"]
+            "fg_color": theme["accent"],
+            "hover_color": theme["hover"],
+            "text_color": theme["text"]
         }
 
         # Allow user-provided arguments to override the defaults
@@ -36,6 +33,15 @@ class PrimaryButton(ctk.CTkButton):
         
         # Call the parent class's __init__ method with the master and combined arguments
         super().__init__(master=master, **defaults)
+
+    # Method/function for updating the theme
+    def update_theme(self, new_theme):
+        self.configure(
+            fg_color = new_theme["accent"],
+            hover_color = new_theme["hover"],
+            text_color = new_theme["text"]
+            )
+
 
 
 
@@ -52,9 +58,9 @@ class TabsButton(ctk.CTkButton):
             "width": 120,
             "font": ctk.CTkFont(size=14),
             "command": confirmation_print,
-            "fg_color": theme["button_tab_fg_color"],
-            "hover_color": theme["button_tab_fg_color"],
-            "text_color": theme["button_text_color"]
+            "fg_color": theme["main"],
+            "hover_color": theme["main"], # "main" to prevent hover effect
+            "text_color": theme["text"]
         }
 
         # Allow user-provided arguments to override the defaults
@@ -62,6 +68,14 @@ class TabsButton(ctk.CTkButton):
         
         # Call the parent class's __init__ method with the master and combined arguments
         super().__init__(master=master, **defaults)
+
+    # Method/function for updating the theme
+    def update_theme(self, new_theme):
+        self.configure(
+            fg_color = new_theme["main"],
+            hover_color = new_theme["main"],
+            text_color = new_theme["text"]
+            )
 
 
 
@@ -80,14 +94,19 @@ class TabsCategories (ctk.CTkFrame):
 
 
         # Add a test button to the navigation bar
-        tester = TabsButton(
-             master = self,
-             text = "A test tab",
-             theme = theme,
-             corner_radius = 0
+        self.testButton = TabsButton(
+            master = self,
+            text = "A test tab",
+            theme = theme,
+            corner_radius = 0
          )
 
-        tester.grid(row=0, column=0, pady=(10, 0), padx=10)
+        self.testButton.grid(row=0, column=0, pady=(10, 0), padx=10)
+
+    # Method/function for updating the theme
+    # Since the frame is always transparent, just call the buttons own update function to to update that.
+    def update_theme(self, new_theme):
+        self.testButton.update_theme(new_theme)
 
 
 # --- TABS BODY / LIST OF TO-DO's ---
@@ -100,7 +119,7 @@ class TabsBody(ctk.CTkScrollableFrame):
         defaults = {
             "height": 200,
             "width": 250,
-            "fg_color": theme["scrollableFrame_fg_color"]
+            "fg_color": theme["main"]
         }
 
         # Allow user-provided arguments to override the defaults
@@ -109,11 +128,18 @@ class TabsBody(ctk.CTkScrollableFrame):
         # Call the parent class's __init__ method with the master and combined arguments
         super().__init__(master=master, **defaults)
 
+    # Method/function for updating the theme
+    def update_theme(self, new_theme):
+        self.configure(
+            fg_color = new_theme["main"],
+            )
+        
 
 
-# --- TABS/CATEOGRY BAR ---
+# --- FOOTER ---
 class TabsFooter (ctk.CTkFrame):
-    def __init__(self, master, theme, on_back_click, **kwargs):
+    def __init__(self, master, theme, on_back_click, theme_select, **kwargs):
+        # on_back_click and theme_select_callback are arguments where functions are passed from tabs_view.py
 
         defaults = {
             "height": 60,
@@ -124,45 +150,103 @@ class TabsFooter (ctk.CTkFrame):
 
         super().__init__(master=master,**defaults)
 
+
         # Configure the grid columns that the buttons are placed in
         self.grid_columnconfigure(0, weight=0)
         self.grid_columnconfigure(1, weight=1)
         self.grid_columnconfigure(2, weight=0)
+        self.grid_columnconfigure(3, weight=1)
+        self.grid_columnconfigure(4, weight=0)
 
         # Add a "back" button
             # Get settings for a default button
-        default_theme = themes.get_theme("default")
+        default_theme = themes.get_theme("Default")
 
             # Create the back button
-        button_back = PrimaryButton(
-             master = self,
-             text = "Back",
-             theme = default_theme,
-             command = on_back_click # Use function input as arg in __init__
+        self.button_back = PrimaryButton(
+            master = self,
+            width = 45,
+            height = 45,
+            text = "<",
+            font = ("", 26),
+            theme = default_theme,
+            command = on_back_click # "on_back_click" is a function passed through inits argument
          )
 
         # Add it to the grid
-        button_back.grid(row=0, column=0, pady=0, padx=0, sticky="w")
+        self.button_back.grid(row=0, column=0, pady=0, padx=0, sticky="w")
+
+
+
+        # Create the theme selector label/button
+
+        # Create the frame that holds the dropdown label and menu
+        self.theme_selector_frame = ctk.CTkFrame(master=self, fg_color="transparent")
+
+        # Put this frame in the far right footer column
+        self.theme_selector_frame.grid(row=0, column=2, pady=0, padx=0, sticky="e")
+
+        # Create the dropdown/theme selector label
+        theme_label = ctk.CTkLabel(
+            master = self.theme_selector_frame, # Master is the new frame that's in the footers far right column 
+            text = "Theme:",
+            font = ("", 16)
+        )
+
+        # Put the label in the first internal column
+        theme_label.grid(row=0, column=0, padx=(0, 10))
+
+
+        # Create the dropdown menu
+
+            # Store the function that was passed through the __init__ so we can access it later.
+            # The "theme_select" (right) acts as a delivery man, delivering the function to the instance's own variable ("self.theme_select") then leaves. They don't need to be called the same.
+        self.theme_select = theme_select
+    
+        # Create the option menu that lets user select color theme
+        self.option_menu = ctk.CTkOptionMenu(
+            master = self.theme_selector_frame, # Master is the new frame that's in the footers far right column
+            fg_color = theme["main"],
+            button_color = theme["accent"],
+            button_hover_color = theme["hover"],
+            dropdown_fg_color = theme["main"],
+            dropdown_hover_color = theme["hover"],
+            height = 40,
+            values = ["Default", "Red", "Green", "Blue", "Yellow", "Purple"],
+            command = self.theme_select # use the function passed through the __init__ with the selected option (e.g., "red" or "blue") as arguments to that function.
+        )
+
+        # Put the label in the second internal column
+        self.option_menu.grid(row=0, column=1, pady=0, padx=0)
+
+
 
 
         # Add an "add" button
-        button_add = PrimaryButton(
-             master = self,
-             text = "Add",
-             theme = theme
-             # ADD COMMAND HERE
+        self.button_add = PrimaryButton(
+            master = self,
+            width = 50,
+            height = 40,
+            text = "+",
+            font = ("", 34, "bold"),
+            theme = theme
+            # ADD COMMAND HERE
          )
 
         # Add it to the grid
-        button_add.grid(row=0, column=1, pady=0, padx=0)
+        self.button_add.grid(row=0, column=4, pady=0, padx=0)
         
-    
-        # Create the option menu that lets user select color theme
-        option_menu = ctk.CTkOptionMenu(
-            master=self,
-            fg_color = theme["scrollableFrame_fg_color"],
-            button_color = "black",
-            values = ["option 1", "option2"],
-        )
 
-        option_menu.grid(row=0, column=2, pady=0, padx=0, sticky="e")
+
+
+# --- FUNCTIONS ---
+
+    # Method/function for updating the theme
+    def update_theme(self, new_theme):
+        self.button_add.update_theme(new_theme)
+        self.option_menu.configure(
+            fg_color = new_theme["main"],
+            button_color = new_theme["accent"],
+            button_hover_color = new_theme["hover"],
+            dropdown_fg_color = new_theme["main"]
+        )

@@ -8,9 +8,6 @@ from todo_app.ui import themes
 # Import the main frame color for all frames
 from todo_app.ui.themes import MAIN_FRAME_COLOR
 
-# Get the settings for the default theme
-default_theme = themes.get_theme("default")
-
 
 # --- MAIN UI/LANDING "PAGE" CLASS ---
 class ProjectsView(ctk.CTkFrame):
@@ -24,6 +21,9 @@ class ProjectsView(ctk.CTkFrame):
     # argument/self.
     # This only happens when for functions inside a class, not for functions
     # outside a class.  
+
+        # Get the settings for the default theme
+        self.default_theme = themes.get_theme("Default")
 
         # (Analogy: Add seats to the car chassi)
         defaults = {
@@ -57,7 +57,7 @@ class ProjectsView(ctk.CTkFrame):
             # use 'lambda' to to create a mini/anonymous function, this
             # prevents the command from running when script is being executed/# application is started.
             command = lambda: self.set_view("tabs"),
-            theme = default_theme
+            theme = self.default_theme
         )
         test_button.grid(row=1, column=0, padx=20, pady=20)
 
@@ -65,7 +65,7 @@ class ProjectsView(ctk.CTkFrame):
             master = self,
             text = "Add project",
             command = self.open_add_project,
-            theme = default_theme
+            theme = self.default_theme
         )
         button_add_project.grid(row=2, column=0, padx=20, pady=20)
 
@@ -74,7 +74,7 @@ class ProjectsView(ctk.CTkFrame):
             master = self,
             text = "Print button",
             command = self.print,
-            theme = default_theme
+            theme = self.default_theme
         )
         button_print.grid(row=3, column=0, padx=20, pady=20)
 
@@ -103,8 +103,8 @@ class ProjectsView(ctk.CTkFrame):
             title = "Add new project",
             text = "Project name:",
             fg_color = MAIN_FRAME_COLOR,
-            button_fg_color = default_theme["button_fg_color"],
-            button_hover_color = default_theme["button_hover_color"]
+            button_fg_color = self.default_theme["accent"],
+            button_hover_color = self.default_theme["hover"]
         )
 
         # --- POSITIONING THE DIALOG ---
