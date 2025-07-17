@@ -1,6 +1,4 @@
 
-
-
 # Define the main background color for all views
 MAIN_FRAME_COLOR = "#202020"
 

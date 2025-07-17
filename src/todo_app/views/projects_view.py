@@ -4,6 +4,7 @@ import tkinter as tk
 import customtkinter as ctk
 from todo_app.ui import widgets as ui
 from todo_app.ui import themes
+from todo_app.core import data as data
 
 # Import the main frame color for all frames
 from todo_app.ui.themes import MAIN_FRAME_COLOR
@@ -13,8 +14,6 @@ from todo_app.ui.themes import MAIN_FRAME_COLOR
 class ProjectsView(ctk.CTkFrame):
     """Main class"""
 
-    # Constructor (Analogy: configure order for the car chassi)
-    # __init__ is called when an object/instance of this is created
     def __init__(self, master, **kwargs):
     # Self: When this/a ProjectClass 'object' is created/instanced, it will
     # automatically call the __init__ method and pass itself as the first and 
@@ -25,7 +24,13 @@ class ProjectsView(ctk.CTkFrame):
         # Get the settings for the default theme
         self.default_theme = themes.get_theme("Default")
 
-        # (Analogy: Add seats to the car chassi)
+        # Set start variables for placing projects in order
+        self.current_projects_row = 0
+        self.current_projects_column = 0
+
+        # Start value for checking if projects exist
+        self.projects_exists = False
+
         defaults = {
             "fg_color": MAIN_FRAME_COLOR
         }
@@ -36,66 +41,124 @@ class ProjectsView(ctk.CTkFrame):
         # (Analogy: order the car chassi with the new specifications)
         super().__init__(master, **defaults)
 
-
+        # Fix main grid configuration
         self.grid_rowconfigure(0, weight=1)
-        self.grid_rowconfigure(1, weight=1)
-        self.grid_rowconfigure(2, weight=1)
-        self.grid_rowconfigure(3, weight=1)
+        self.grid_rowconfigure(1, weight=0)
 
         self.grid_columnconfigure(0, weight=1)
-        self.grid_columnconfigure(1, weight=0)
-        self.grid_columnconfigure(2, weight=0)
 
 
-        header = ctk.CTkLabel(master=self, text="My Test label")
-        header.grid(row=0, column=0, padx=20, pady=20)
 
+        # --- NO PROJECTS FRAME / TEXT ---
+            # If there are no projects, this text will show
 
-        test_button = ui.PrimaryButton(
+            # Create the frame that will hold the text
+        self.no_projects_frame = ui.NoProjectsFrame(
             master = self,
-            text = "Example project",
-            # use 'lambda' to to create a mini/anonymous function, this
-            # prevents the command from running when script is being executed/# application is started.
-            command = lambda: self.set_view("tabs"),
-            theme = self.default_theme
         )
-        test_button.grid(row=1, column=0, padx=20, pady=20)
+        
+            # Place it in the main projects view grid
+        self.no_projects_frame.grid(row=0, column=0)
 
-        button_add_project = ui.PrimaryButton(
+
+
+        # --- LIST / GRID OF PROJECTS ---
+            # If there are projects, this frame/grid will show
+
+            # Create widget / frame
+        self.projects_grid = ui.ProjectsGrid(
+            master = self
+        )
+
+            # Place it in the main projects view grid
+        self.projects_grid.grid(row=0, column=0)
+
+
+
+        # --- 'ADD/REMOVE PROJECT' BUTTONS ---
+
+            # Create the frame that holds the add/remove project buttons and error text
+        self.add_remove_frame = ctk.CTkFrame(
             master = self,
-            text = "Add project",
+            fg_color = "transparent"
+        )
+
+            # Add it/new frame to the projects view frame 
+        self.add_remove_frame.grid(row=1, column=0, padx=20, pady=20)
+
+            # Fix it's configuration
+        self.add_remove_frame.grid_rowconfigure(0, weight=1)
+        self.add_remove_frame.grid_columnconfigure(0, weight=1)
+        self.add_remove_frame.grid_columnconfigure(1, weight=1)
+
+
+
+            # Create the "add project" button
+        self.button_add_project = ui.SquareButton(
+            master = self.add_remove_frame,
+            text = "+",
             command = self.open_add_project,
-            theme = self.default_theme
+            theme = self.default_theme,
+            border_color = "#416E2B",
         )
-        button_add_project.grid(row=2, column=0, padx=20, pady=20)
 
+        self.button_add_project.grid(row=0, column=0, padx=25, pady=20)
 
-        button_print = ui.PrimaryButton(
-            master = self,
-            text = "Print button",
-            command = self.print,
-            theme = self.default_theme
+            # Create the error text that appears when project doesn't have a name
+        self.error_text = ctk.CTkLabel(
+            master = self.add_remove_frame,
+            text = "", # Text is added when an error arises
+            font = ("", 16),
+            text_color = "#be4d4d"
         )
-        button_print.grid(row=3, column=0, padx=20, pady=20)
+
+        self.error_text.grid(row=1, column=0, padx=20)
+        
 
 
+        # --- REMOVE PROJECTS BUTTON ---
+            # Create the "remove project" button
+        self.button_remove_project = ui.SquareButton(
+            master = self.add_remove_frame,
+            text = "-",
+            # ADD COMMAND HERE
+            theme = self.default_theme,
+            border_color = "#6E2B2B",
+        )
+
+        self.button_remove_project.grid(row=0, column=1, padx=25, pady=20)
+        
 
 
-# --- FUNCTIONS ---
+        # --- SHOW/HIDE THE CORRECT UI ELEMENTS AT LAUNCH ---
+
+        if self.projects_exists == False:
+            # Hide the grid of projects
+            self.projects_grid.grid_remove()
+            # Show the "No projects" frame/text
+            self.no_projects_frame.grid()
+            # Hide the "Remove projects button"
+            self.button_remove_project.grid_remove()
+        
+        else:
+            # Show the grid of projects
+            self.projects_grid.grid()
+            # Hide the "No projects" frame/text
+            self.no_projects_frame.grid_remove()
+            # Show the "Remove projects button"
+            self.button_remove_project.grid()
 
 
-    # TEMP FUNCTION - Lets a button print something
-    def print(self):
-        cursor_x = tk.Tk.winfo_pointerx(self)
-        cursor_y = tk.Tk.winfo_pointery(self)
-        print("Cursor X: ", cursor_x, "Cursor Y: ", cursor_y)
-
-
+# --- FUNCTIONS/METHODS ---
 
     # Change the view/page
-    def set_view(self, to_view):
-        self.master.show_view(to_view)
+        # Function that just calls the function in main.py
+    def set_view(self, to_view, project_data):
+        self.master.set_view(to_view, project_data )
 
+
+
+    # "ADD PROJECT" POPUP/DIALOG BOX
 
     # Open the "Add project" popup/dialog window
     def open_add_project(self):
@@ -107,35 +170,80 @@ class ProjectsView(ctk.CTkFrame):
             button_hover_color = self.default_theme["hover"]
         )
 
-        # --- POSITIONING THE DIALOG ---
-
-        dialog.iconbitmap("D:/Projects/Programming/ToDoApp/src/todo_app/assets/icon_main.ico")
-
-        # Makes sure the dialogs contents are fully arranged and ready before doing anything else.
+        # Position the dialog box
+            # Makes sure the dialogs contents are fully arranged and ready before doing anything else.
         dialog.update_idletasks()
 
-        # Get cursor position
+            # Get cursor position
         pointer_x = self.winfo_pointerx()
         pointer_y = self.winfo_pointery()
 
-        # Offset window from cursor
-        # Manually figured out the size of the popup and hardcoded in offsets
+            # Offset popup window from cursor
+            # Manually figured out the size of the popup and hardcoded in offsets
         pos_x = pointer_x - 175 # Remove half of width from pos x
         pos_y = pointer_y - 100 # Remove half of height from pos y
     
 
-        # Set the dialog position
+            # Set the dialog position
         dialog.geometry(f"+{pos_x}+{pos_y}")
 
         # After 200 milliseconds, apply the icon to the window
         # (Ctk applies its own after ~150ms so we have to wait until after that)
         dialog.after(200, lambda: dialog.iconbitmap("D:/Projects/Programming/ToDoApp/src/todo_app/assets/icon_main.ico"))
 
-
-
-        # --- END POSITIONING ---
-
+        # When popup/dialog is closed (Either OK, CANCEL or X)
         input_text = dialog.get_input()
 
+        # If dialog is closed with Cancel or X
+        if input_text == None:
+            pass
 
-        print("Input text: ", input_text)
+        # Else if dialog is closed with OK, but project is missing name
+        elif input_text == "" or None:
+            self.error_text.configure(text = "Project needs a name!")
+
+        # Else create a new project button.
+        else:
+
+                # Create a project data object
+            project = data.Project(
+                name = input_text
+            )
+
+                # Create the project button
+            project_button = ui.ProjectButton(
+                master = self.projects_grid.projects_grid,
+                theme = self.default_theme,
+                set_view = lambda *args: self.set_view("tabs", project),
+                project_data = project # Send the data about the project to this button
+            )
+
+            project_button.grid(
+                row = self.current_projects_row,
+                column = self.current_projects_column,
+                padx=20,
+                pady=(10, 10)
+                )
+
+            # Increment up the counters
+                # If we are not currently on the last column, increment it
+            if self.current_projects_column < 2:
+                self.current_projects_column += 1
+
+                # If we are on the last column, increase to row counter and reset column counter
+            else:
+                self.current_projects_row += 1
+                self.current_projects_column = 0
+            
+            # Set text to be nothing if a project was successfully created.
+            self.error_text.configure(text = "")
+
+            # Set projects exists to true and show the window
+            self.projects_exists = True
+
+            # Show the grid of projects
+            self.projects_grid.grid()
+            # Hide the "No projects" frame/text
+            self.no_projects_frame.grid_remove()
+            # Show the "Remove projects button"
+            self.button_remove_project.grid()

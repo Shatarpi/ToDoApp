@@ -24,7 +24,7 @@ class App(ctk.CTk):
         
         # Define the starting size of the main application
         app_width = 750
-        app_height = 450
+        app_height = 550
 
         # Use normal Tkinter to get the monitor size
         screen_width = self.winfo_screenwidth()
@@ -67,18 +67,33 @@ class App(ctk.CTk):
 
 
         # --- Initial view when launching the program ---
-        self.show_view("projects")
+        self.set_view("projects", None)
 
 
+
+    # --- FUNCTIONS / METHODS ---
 
     # Function for toggling views/pages
-    def show_view(self, view_name):
+    def set_view(self, view_name, project_data):
         # Check if the view (key) is in the views dictionary
         if view_name in self.views:
-            # If true, get the instance (value) matching the key and raise that.
-            self.views[view_name].tkraise()
+
+            # Store the actual view we want to switch to
+            target_view = self.views[view_name]
+
+            # If we are going to "Tabs View"
+            if view_name == "tabs" and project_data is not None:
+                # Go into tabs view and call the internal function/method to let it load the project data/information.
+                target_view.load_project(project_data)
+
+            # Regardless of which view we're going to, raise/show it.
+            target_view.tkraise()
+
+        # Else if view is not found, print error
         else:
             print(f"ERROR: View '{view_name}' not found")
+
+
 
 # --- RUN THE APPLICATION ---
 

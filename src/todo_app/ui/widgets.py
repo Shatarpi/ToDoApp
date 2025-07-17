@@ -10,19 +10,27 @@ def confirmation_print():
 
 
 
-# --- PRIMARY BUTTON ---
-class PrimaryButton(ctk.CTkButton):
+# --- PROJECT BUTTON ---
+class ProjectButton(ctk.CTkButton):
     """
-    A custom primary button that inherits from CTkButton.
-    It sets default styling for the application, which can be overridden.
+    The button that gets created whenever a project is created. Stores various other information such as project name, which tabs/categories it got etc.
     """
-    def __init__(self, master, theme, **kwargs):
+    def __init__(self, master, theme, set_view, project_data, **kwargs):
+
+        # Store the incoming function
+        self.set_view = set_view
+
+        # Store the incoming project data so each button stores it's unique data
+        self.project_data = project_data
         
         defaults = {
-            "height": 40,
-            "width": 160,
-            "font": ctk.CTkFont(size=14),
-            "command": confirmation_print,
+            "height": 75,
+            "width": 130,
+            "border_width": 1,
+            "corner_radius": 15,
+            "text": self.project_data.project_name,
+            "font": ctk.CTkFont(size=16, weight="bold"),
+            "command": lambda: self.set_view("tabs", self.project_data),
             "fg_color": theme["accent"],
             "hover_color": theme["hover"],
             "text_color": theme["text"]
@@ -41,6 +49,235 @@ class PrimaryButton(ctk.CTkButton):
             hover_color = new_theme["hover"],
             text_color = new_theme["text"]
             )
+        
+
+
+
+# --- SQUARE BUTTON ----
+class SquareButton(ctk.CTkButton):
+    def __init__(self, master, theme, **kwargs):
+        """
+        Square button, used for add/remove/back etc. Usually with just a "+" or "<"
+        """
+        defaults = {
+            "height": 60,
+            "width": 60,
+            "text": "#",
+            "font": ctk.CTkFont(size=24, weight="bold"),
+            "corner_radius": 15,
+            "border_width": 2,
+            "border_color": "#707070",
+            "command": confirmation_print,
+            "fg_color": theme["accent"],
+            "hover_color": theme["hover"],
+            "text_color": theme["text"]
+        }
+
+        # Allow user-provided arguments to override the defaults
+        defaults.update(kwargs)
+        
+        # Call the parent class's __init__ method with the master and combined arguments
+        super().__init__(master=master, **defaults)
+
+    def update_theme(self, new_theme):
+        self.configure(
+            fg_color = new_theme["accent"],
+            hover_color = new_theme["hover"],
+            text_color = new_theme["text"]
+            )
+
+
+# --- TABS VIEW HEADER ---
+
+class TabsHeader (ctk.CTkFrame):
+    def __init__(self, master, **kwargs):
+        """
+        This will just display the current project you are in
+        """
+
+        defaults = {
+            "fg_color": "transparent"
+        }
+    
+        defaults.update(kwargs)
+
+        super().__init__(master=master, **defaults)
+
+        self.grid_rowconfigure(0, weight=1)
+        self.grid_columnconfigure(0, weight=1)
+
+        self.header = ctk.CTkLabel(
+            master = self,
+            text = "Testing",
+            font = ("", 24, "bold"),
+            text_color = "#707070"
+            )
+        
+        self.header.grid(row=0, column=0, pady=(20, 0))
+
+
+    # Sets the text/label to the projects name
+    def set_text(self, project_data):
+        self.header.configure(
+            text = project_data.project_name,
+        )
+
+
+
+
+# --- NO PROJECTS FRAME / TEXT ---
+    # If there are no projects, this text will show
+
+class NoProjectsFrame(ctk.CTkFrame):
+    """The frame and text that shows when no projects exists"""
+
+    def __init__(self, master, **kwargs):
+        # Create the frame that holds the text
+        defaults = {
+        "fg_color": "#252525",
+        "border_width": 1,
+        "border_color": "#505050"
+        }
+
+
+        # Allow user-provided arguments to override the defaults
+        defaults.update(kwargs)
+
+        super().__init__(master=master, **defaults)
+
+        # Configure the frame
+        self.grid_rowconfigure(0, weight=1)
+        self.grid_rowconfigure(1, weight=0)
+        self.grid_rowconfigure(2, weight=1)
+
+        self.grid_columnconfigure(0, weight=1)
+        self.grid_columnconfigure(1, weight=0)
+        self.grid_columnconfigure(2, weight=1)
+
+
+        # Create the big text
+        no_projects_label = ctk.CTkLabel(
+            master = self,
+            text = "No projects exist yet",
+            font = ("", 48),
+            text_color = "#404040"
+        )
+
+        # Place it in the no_projects_frame
+        no_projects_label.grid(row=0, column=0, padx=40, pady=40)
+
+
+
+# --- LIST / GRID OF PROJECTS ---
+    # If there are projects, this frame/grid will show
+    
+class ProjectsGrid(ctk.CTkFrame):
+    """The frame/grid of projects/buttons"""
+
+    def __init__(self, master, **kwargs):
+        # Create the frame that holds the text
+        defaults = {
+        "fg_color": "#252525",
+        "border_width": 1,
+        "border_color": "#505050"
+        }
+
+        # Allow user-provided arguments to override the defaults
+        defaults.update(kwargs)
+
+        super().__init__(master=master, **defaults)
+
+        # Configure the frame
+        self.grid_rowconfigure(0, weight=1)
+        self.grid_rowconfigure(1, weight=1)
+        self.grid_columnconfigure(0, weight=1)
+
+
+        # HEADER FRAME (with the "Projects:" text)
+        self.projects_header = ctk.CTkFrame(
+            master = self,
+            fg_color = "transparent",
+        )
+
+            # Place it in the projects frame
+        self.projects_header.grid(row=0, column=0, sticky="nsew", padx=5, pady=5)
+
+            # Fix it's configuration
+        self.projects_header.grid_rowconfigure(0, weight=1)
+        self.projects_header.grid_rowconfigure(1, weight=1)
+        self.projects_header.grid_columnconfigure(0, weight=1)
+    
+
+            # Create a header at the top of the new frame
+        projects_label = ctk.CTkLabel(
+            master = self.projects_header,
+            text = "Projects:",
+            text_color = "#707070",
+            font = ("", 18, "bold"),
+        )
+
+            # Place the it in the frame that will contain all the projects
+        projects_label.grid(row=0, column=0, pady=(10, 0))
+
+
+
+        # GRID FRAME (that holds the project buttons)
+        self.projects_grid = ctk.CTkFrame(
+            master = self,
+            fg_color = "transparent",
+        )
+
+            # Place it in the projects frame
+        self.projects_grid.grid(row=1, column=0, sticky="nsew", padx=5, pady=5)
+
+            # Fix it's configuration
+        self.grid_rowconfigure(0, weight=1)
+        self.grid_rowconfigure(1, weight=1)
+        self.grid_columnconfigure(0, weight=1)
+        
+
+
+# --- NO TABS / CATEGORIES FRAME ---
+
+class NoTabsFrame(ctk.CTkFrame):
+    """The frame and text that shows when no tabs inside a project exists"""
+
+    def __init__(self, master, theme, **kwargs):
+        # Create the frame that holds the text
+        defaults = {
+        "fg_color": theme["main"],
+        "border_width": 1,
+        "border_color": "#505050"
+        }
+
+        # Allow user-provided arguments to override the defaults
+        defaults.update(kwargs)
+
+        super().__init__(master=master, **defaults)
+
+        # Configure the frame
+        self.grid_rowconfigure(0, weight=1)
+        self.grid_rowconfigure(1, weight=0)
+        self.grid_rowconfigure(2, weight=1)
+
+        self.grid_columnconfigure(0, weight=1)
+        self.grid_columnconfigure(1, weight=0)
+        self.grid_columnconfigure(2, weight=1)
+
+
+        # Create the text that goes in the frame
+        no_tabs_label = ctk.CTkLabel(
+            master = self,
+            text = "No categories exist yet",
+            font = ("", 48, "bold"),
+            text_color = "#404040"
+            
+        )
+
+
+        # Place it in the new frame
+        no_tabs_label.grid(row=1, column=1)
+
 
 
 
@@ -109,6 +346,7 @@ class TabsCategories (ctk.CTkFrame):
         self.testButton.update_theme(new_theme)
 
 
+
 # --- TABS BODY / LIST OF TO-DO's ---
 class TabsBody(ctk.CTkScrollableFrame):
     """
@@ -136,9 +374,9 @@ class TabsBody(ctk.CTkScrollableFrame):
         
 
 
-# --- FOOTER ---
+# --- TABS FOOTER ---
 class TabsFooter (ctk.CTkFrame):
-    def __init__(self, master, theme, on_back_click, theme_select, **kwargs):
+    def __init__(self, master, theme, on_back_click, on_add_click, theme_select, **kwargs):
         # on_back_click and theme_select_callback are arguments where functions are passed from tabs_view.py
 
         defaults = {
@@ -152,48 +390,57 @@ class TabsFooter (ctk.CTkFrame):
 
 
         # Configure the grid columns that the buttons are placed in
+        self.grid_rowconfigure(0, weight=0)
+        self.grid_rowconfigure(1, weight=0)
+
         self.grid_columnconfigure(0, weight=0)
         self.grid_columnconfigure(1, weight=1)
         self.grid_columnconfigure(2, weight=0)
         self.grid_columnconfigure(3, weight=1)
         self.grid_columnconfigure(4, weight=0)
 
+
+        # Create the error text that appears when category doesn't have a name
+        self.error_text = ctk.CTkLabel(
+            master = self,
+            text = "", # Text is added when an error arises
+            font = ("", 16),
+            text_color = "#be4d4d"
+        )
+
+        self.error_text.grid(row=0, column=2, pady=0, padx=0)
+
         # Add a "back" button
             # Get settings for a default button
         default_theme = themes.get_theme("Default")
 
-            # Create the back button
-        self.button_back = PrimaryButton(
+        self.button_back = SquareButton(
             master = self,
-            width = 45,
-            height = 45,
             text = "<",
-            font = ("", 26),
+            command = on_back_click,
             theme = default_theme,
-            command = on_back_click # "on_back_click" is a function passed through inits argument
-         )
+        )
 
-        # Add it to the grid
-        self.button_back.grid(row=0, column=0, pady=0, padx=0, sticky="w")
-
+            # Add it to the grid
+        self.button_back.grid(row=1, column=0, pady=0, padx=0, sticky="w")
 
 
-        # Create the theme selector label/button
+        # Create the theme selector label and button
 
-        # Create the frame that holds the dropdown label and menu
+            # Create the frame that holds the dropdown label and menu
         self.theme_selector_frame = ctk.CTkFrame(master=self, fg_color="transparent")
 
-        # Put this frame in the far right footer column
-        self.theme_selector_frame.grid(row=0, column=2, pady=0, padx=0, sticky="e")
+            # Put this frame in the center column
+        self.theme_selector_frame.grid(row=1, column=2, pady=0, padx=0, sticky="e")
 
-        # Create the dropdown/theme selector label
+            # Create the dropdown/theme selector label
         theme_label = ctk.CTkLabel(
             master = self.theme_selector_frame, # Master is the new frame that's in the footers far right column 
             text = "Theme:",
             font = ("", 16)
         )
 
-        # Put the label in the first internal column
+            # Put the label in the first internal column
         theme_label.grid(row=0, column=0, padx=(0, 10))
 
 
@@ -219,29 +466,36 @@ class TabsFooter (ctk.CTkFrame):
         # Put the label in the second internal column
         self.option_menu.grid(row=0, column=1, pady=0, padx=0)
 
-
-
-
-        # Add an "add" button
-        self.button_add = PrimaryButton(
+        
+        # Create the "add" button
+        self.button_add = SquareButton(
             master = self,
-            width = 50,
-            height = 40,
             text = "+",
-            font = ("", 34, "bold"),
-            theme = theme
-            # ADD COMMAND HERE
-         )
+            command = on_add_click,
+            theme = theme,
+        )
 
         # Add it to the grid
-        self.button_add.grid(row=0, column=4, pady=0, padx=0)
+        self.button_add.grid(row=1, column=4, pady=0, padx=0)
         
+
 
 
 
 # --- FUNCTIONS ---
 
-    # Method/function for updating the theme
+    # Footer functions/methods
+
+        # Hide parts of UI when no tabs exist
+    def show_ui(self, show):
+        if show == True:
+            self.theme_selector_frame.grid()
+        else:
+            self.theme_selector_frame.grid_remove()
+
+
+
+        # Method/function for updating the theme
     def update_theme(self, new_theme):
         self.button_add.update_theme(new_theme)
         self.option_menu.configure(
