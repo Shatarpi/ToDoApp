@@ -16,7 +16,8 @@ class Category():
     The object that stores the data/information about a category
     """
 
-    def __init__(self, name, theme_settings):
+    def __init__(self, name, theme_name, theme_settings):
         self.name = name
+        self.theme_name = theme_name
         self.theme_settings = theme_settings
         self.todo_items = []

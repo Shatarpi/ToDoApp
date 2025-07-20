@@ -122,10 +122,134 @@ class TabsView(ctk.CTkFrame):
     # --- FUNCTIONS/METHODS ---
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
     # Load project - changes UI elements based on which project whas selected
     def load_project(self, project_data):
         self.active_project = project_data # Store the project data
         self.header.set_text(project_data) # Tell the header widget to change it's text to display the correct project name
+
+
+        # If there was an active category from previous project
+        if self.active_category is not None:
+            # Remove it's body/to-do list from the main grid
+            self.category_components[self.active_category]["body"].grid_remove()
+
+
+        # Remove the old category components (tab/button and body/frame) from the GUI
+        for category_name, components in self.category_components.items():
+            components["tab"].destroy()
+            components["body"].destroy()
+
+        # Clear the main dictionary
+        self.category_components = {}
+
+        # Reset variables
+        self.active_category = None
+        self.current_tab_column = 0
+
+        # Check if the active projects does NOT have any categories
+        if not self.active_project.categories:
+            
+            # Set the status variable
+            self.categories_exist = False
+
+            # Hide the top row of button/tabs
+            self.tabs.grid_remove()
+            # Hide the theme selector dropdown (and label)
+            self.footer.show_ui(False)
+            # Set dropdown value
+            self.footer.set_dropdown("Default")
+
+            # Set the footer theme (mainly for the add button)
+            self.footer.update_theme(themes.get_theme("Default"))
+
+            # Show the "no tabs exist" frame/text
+            self.no_tabs_exist.grid()
+
+        # If list DOES have categories
+        else:
+
+
+            # Loop through the projects categories
+            for category_object in self.active_project.categories:
+                
+                    
+                    # CREATE A TAB BUTTON
+                category_button = ui.TabsButton(
+                    master = self.tabs,
+                    theme = category_object.theme_settings,
+                    text = category_object.name,
+                    command = lambda name = category_object.name: self.change_category(name) # The button stores the category name as argument for it's command.
+                )
+
+                    # Add button to grid/row of tab buttons
+                category_button.grid(
+                    row = 0,
+                    column = self.current_tab_column,
+                    padx = 5
+                )
+
+                    # Increment up the counter so next button goes in the next column
+                self.current_tab_column += 1
+
+
+                    # CREATE BODY / TO-DO LIST
+
+                    # Create the "body"/scrollable frame that holds the to-do items
+                body = ui.TabsBody(
+                    master = self,
+                    theme = category_object.theme_settings
+                )
+
+                    # DON'T ADD THE BODY TO THE GRID HERE, THE CHANGE CATEGORY FUNCTION DOES THAT
+
+                    # Store the components of that category in a dictionary
+                self.category_components[category_object.name] = {
+                    "tab": category_button,
+                    "body": body
+                }
+
+
+            # Change status
+            self.categories_exists = True
+
+            # Update the UI
+
+                # Hide the "no tabs exist" frame/text
+            self.no_tabs_exist.grid_remove()
+
+                # Show frame with tabs/buttons/categories
+            self.tabs.grid()
+
+            # show the theme selector dropdown (and label)
+            self.footer.show_ui(True)
+            
+            # Store the first category in the project as a VAR
+            first_category = self.active_project.categories[0].name
+
+            # Change the category to the first category in the project
+            self.change_category(first_category)
+
+
+
+
+
+
+
+
+
 
 
     # Set view (back button, goes back to projects_view)
@@ -146,13 +270,13 @@ class TabsView(ctk.CTkFrame):
             if category_name == to_category:
                 # Add the body/frame/list of to-dos to the main grid
                 category_component["body"].grid(row=1, column=0, padx=20, 
-                                                sticky="nsew")
+                sticky="nsew")
                 
             # Otherwise hide the stored "body" from the UI.
             else:
                 category_component["body"].grid_remove()
 
-        # Loop through the list of of categories in the PROJECT object (which holds name, theme settings etc.)
+        # Loop through the list of of categories in the PROJECT object (which holds category objects)
         for category_object in self.active_project.categories:
 
             # # if category name IS the same as the category we want to be active 
@@ -163,6 +287,9 @@ class TabsView(ctk.CTkFrame):
 
                 # Update the footer with the new settings
                 self.footer.update_theme(settings)
+
+                # Set the theme selector/dropdown to use the category's theme.
+                self.footer.set_dropdown(category_object.theme_name)
 
                 # Once found and updated, exit the loop
                 break
@@ -182,19 +309,21 @@ class TabsView(ctk.CTkFrame):
             # Find the active category OBJECT and update its theme_settings
             active_category_object = None
 
-            # Loop through the categories store in the active project
+                # Loop through the category objects stored in the active project
             for category_object in self.active_project.categories:
 
-                # If the name of the category matches the active categories name
+                # If the objects category name matches the active categories name
                 if category_object.name == self.active_category:
 
-                    # Store the category OBJECT that matches
+                    # Store the category OBJECT that matches as active_category_object
                     active_category_object = category_object
                     break
             
             # Store the new settings in the stored OBJECT
             if active_category_object:
+                active_category_object.theme_name = selected_theme_name
                 active_category_object.theme_settings = new_theme
+    
 
 
             # Go into category_components (which holds all the dictionaries of stored widgets par category), get the dictionary that is our current category, then get the button associated with it's "tab" key.
@@ -209,7 +338,7 @@ class TabsView(ctk.CTkFrame):
 
             # Update the category OBJECTs theme setting
             
-
+        # If there is no active category
         else:
             print("No active category - Can't change theme!")
 
@@ -273,6 +402,7 @@ class TabsView(ctk.CTkFrame):
             # Create a category data object
             category = data.Category(
                 name = input_text,
+                theme_name = "Default",
                 theme_settings = self.theme_settings
             )
             
@@ -351,3 +481,6 @@ class TabsView(ctk.CTkFrame):
 
             # Update the footers theme to be the default theme 
             self.footer.update_theme(self.theme_settings)
+
+            # Set the theme selector/dropdown menu back to default
+            self.footer.set_dropdown("Default")

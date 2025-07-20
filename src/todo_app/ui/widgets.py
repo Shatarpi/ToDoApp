@@ -478,7 +478,8 @@ class TabsFooter (ctk.CTkFrame):
         else:
             self.theme_selector_frame.grid_remove()
 
-    def set_dropdown(value):
+    # Change the dropdown item (from e.g., "Red" to "Default")
+    def set_dropdown(self, value):
         if hasattr(self, 'option_menu'):
             self.option_menu.set(value)
         else:
@@ -493,5 +494,6 @@ class TabsFooter (ctk.CTkFrame):
             fg_color = new_theme["main"],
             button_color = new_theme["accent"],
             button_hover_color = new_theme["hover"],
-            dropdown_fg_color = new_theme["main"]
+            dropdown_fg_color = new_theme["main"],
+            dropdown_hover_color = new_theme["hover"]
         )
