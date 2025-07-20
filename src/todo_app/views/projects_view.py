@@ -191,6 +191,8 @@ class ProjectsView(ctk.CTkFrame):
         # (Ctk applies its own after ~150ms so we have to wait until after that)
         dialog.after(200, lambda: dialog.iconbitmap("D:/Projects/Programming/ToDoApp/src/todo_app/assets/icon_main.ico"))
 
+
+
         # When popup/dialog is closed (Either OK, CANCEL or X)
         input_text = dialog.get_input()
 
@@ -218,6 +220,7 @@ class ProjectsView(ctk.CTkFrame):
                 project_data = project # Send the data about the project to this button
             )
 
+            # Add the button to the grid
             project_button.grid(
                 row = self.current_projects_row,
                 column = self.current_projects_column,

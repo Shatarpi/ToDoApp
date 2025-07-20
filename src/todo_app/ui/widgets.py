@@ -9,7 +9,6 @@ def confirmation_print():
     print("This works - But you need to assign a command to it!")
 
 
-
 # --- PROJECT BUTTON ---
 class ProjectButton(ctk.CTkButton):
     """
@@ -121,7 +120,6 @@ class TabsHeader (ctk.CTkFrame):
         self.header.configure(
             text = project_data.project_name,
         )
-
 
 
 
@@ -280,8 +278,6 @@ class NoTabsFrame(ctk.CTkFrame):
 
 
 
-
-
 # --- TAB BUTTON ---
 
 class TabsButton(ctk.CTkButton):
@@ -293,8 +289,9 @@ class TabsButton(ctk.CTkButton):
         defaults = {
             "height": 40,
             "width": 120,
+            "corner_radius": 0,
             "font": ctk.CTkFont(size=14),
-            "command": confirmation_print,
+            # No need for a command as it already exists from creating the button in tabs_view.py
             "fg_color": theme["main"],
             "hover_color": theme["main"], # "main" to prevent hover effect
             "text_color": theme["text"]
@@ -305,6 +302,7 @@ class TabsButton(ctk.CTkButton):
         
         # Call the parent class's __init__ method with the master and combined arguments
         super().__init__(master=master, **defaults)
+
 
     # Method/function for updating the theme
     def update_theme(self, new_theme):
@@ -329,21 +327,10 @@ class TabsCategories (ctk.CTkFrame):
 
         super().__init__(master=master,**defaults)
 
-
-        # Add a test button to the navigation bar
-        self.testButton = TabsButton(
-            master = self,
-            text = "A test tab",
-            theme = theme,
-            corner_radius = 0
-         )
-
-        self.testButton.grid(row=0, column=0, pady=(10, 0), padx=10)
-
     # Method/function for updating the theme
-    # Since the frame is always transparent, just call the buttons own update function to to update that.
-    def update_theme(self, new_theme):
-        self.testButton.update_theme(new_theme)
+    # Frame is always transparent, just call the buttons own update function. Button comes from "get active category" in tabs_view
+    def update_theme(self, button, new_theme):
+        button.update_theme(new_theme)
 
 
 
@@ -480,8 +467,6 @@ class TabsFooter (ctk.CTkFrame):
         
 
 
-
-
 # --- FUNCTIONS ---
 
     # Footer functions/methods
@@ -492,6 +477,12 @@ class TabsFooter (ctk.CTkFrame):
             self.theme_selector_frame.grid()
         else:
             self.theme_selector_frame.grid_remove()
+
+    def set_dropdown(value):
+        if hasattr(self, 'option_menu'):
+            self.option_menu.set(value)
+        else:
+            print("Warning: theme_selector_dropdown not found in TabsFooter.") 
 
 
 
