@@ -9,50 +9,68 @@ def get_theme(theme):
     # Define settings for different themes
     default_theme = {
         "main" : "#303030",
-        "secondary" : "#FF00DD", # Temp color
+        "active_category" : "#404040", # Temp color
         "accent" : "#404040",
         "hover" : "#606060",
-        "text" : "#DADADA"
+        "text" : "#DADADA",
+        "checkbox_border" : "#9C3939",
+        "checkbox_hover" : "#C4C4C4",
+        "checkbox_done" : "#349e31"
     }
 
     red_theme = {
         "main" : "#352929",
-        "secondary" : "#FF00DD", # Temp color
+        "active_category" : "#493030",
         "accent" : "#ad5050",
         "hover" : "#bb7171",
-        "text" : "#DADADA"
+        "text" : "#DADADA",
+        "checkbox_border" : "#9C3939",
+        "checkbox_hover" : "#C4C4C4",
+        "checkbox_done" : "#349e31"
     }
 
     green_theme = {
         "main" : "#3B5541",
-        "secondary" : "#FF00DD", # Temp color
+        "active_category" : "#3C6946",
         "accent" : "#43852f",
         "hover" : "#77a369",
-        "text" : "#DADADA"
+        "text" : "#DADADA",
+        "checkbox_border" : "#9C3939",
+        "checkbox_hover" : "#C4C4C4",
+        "checkbox_done" : "#349e31"
     }
 
     blue_theme = {
         "main" : "#3B4155",
-        "secondary" : "#FF00DD", # Temp color
+        "active_category" : "#3A4569",
         "accent" : "#4173be",
         "hover" : "#7194c9",
-        "text" : "#DADADA"
+        "text" : "#DADADA",
+        "checkbox_border" : "#9C3939",
+        "checkbox_hover" : "#C4C4C4",
+        "checkbox_done" : "#349e31"
     }
 
     yellow_theme = {
         "main" : "#52553B",
-        "secondary" : "#FF00DD", # Temp color
+        "active_category" : "#595E36",
         "accent" : "#858b2c",
         "hover" : "#989c55",
-        "text" : "#DADADA"
+        "text" : "#DADADA",
+        "checkbox_border" : "#9C3939",
+        "checkbox_hover" : "#C4C4C4",
+        "checkbox_done" : "#349e31"
     }
 
     purple_theme = {
         "main" : "#4E3B55",
-        "secondary" : "#FF00DD", # Temp color
+        "active_category" : "#593964",
         "accent" : "#8648a3",
         "hover" : "#ad7dc4",
-        "text" : "#DADADA"
+        "text" : "#DADADA",
+        "checkbox_border" : "#9C3939",
+        "checkbox_hover" : "#C4C4C4",
+        "checkbox_done" : "#349e31"
     }
 
 

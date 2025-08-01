@@ -24,6 +24,9 @@ class ProjectsView(ctk.CTkFrame):
         # Get the settings for the default theme
         self.default_theme = themes.get_theme("Default")
 
+        # Create an empty list that will store all the project OBJECTS
+        self.all_projects = []
+
         # Set start variables for placing projects in order
         self.current_projects_row = 0
         self.current_projects_column = 0
@@ -104,15 +107,23 @@ class ProjectsView(ctk.CTkFrame):
 
         self.button_add_project.grid(row=0, column=0, padx=25, pady=20)
 
-            # Create the error text that appears when project doesn't have a name
-        self.error_text = ctk.CTkLabel(
-            master = self.add_remove_frame,
-            text = "", # Text is added when an error arises
-            font = ("", 16),
-            text_color = "#be4d4d"
+        # Create the frame that holds the error/warning text
+        self.error_text_frame = ctk.CTkFrame(
+            master = self,
+            border_width = 1,
+            border_color = "#da3232"
         )
 
-        self.error_text.grid(row=1, column=0, padx=20)
+            # Create the error text that appears when project doesn't have a name
+        self.error_text = ctk.CTkLabel(
+            master = self.error_text_frame,
+            text = "", # Text is added when an error arises
+            font = ("", 16),
+            text_color = "#da3232"
+        )
+
+        # Add the text to the error text frame
+        self.error_text.grid(row=1, column=0, padx=20, pady = 10)
         
 
 
@@ -162,6 +173,7 @@ class ProjectsView(ctk.CTkFrame):
 
     # Open the "Add project" popup/dialog window
     def open_add_project(self):
+
         dialog = ctk.CTkInputDialog(
             title = "Add new project",
             text = "Project name:",
@@ -192,6 +204,9 @@ class ProjectsView(ctk.CTkFrame):
         dialog.after(200, lambda: dialog.iconbitmap("D:/Projects/Programming/ToDoApp/src/todo_app/assets/icon_main.ico"))
 
 
+        # Hide the error text/frame.
+        self.error_text_frame.grid_remove()
+
 
         # When popup/dialog is closed (Either OK, CANCEL or X)
         input_text = dialog.get_input()
@@ -204,13 +219,34 @@ class ProjectsView(ctk.CTkFrame):
         elif input_text == "" or None:
             self.error_text.configure(text = "Project needs a name!")
 
+            # Show the error frame/text
+            self.error_text_frame.grid(row=2, column=0, padx=20, pady=(0, 20))
+
+
         # Else create a new project button.
         else:
+
+            # Check if a project with that name already exists
+            for project in self.all_projects:
+                if project.project_name == input_text:
+
+                    # Change the error text
+                    self.error_text.configure(text = "A project with that name already exists!")
+                    
+                    # Show the error frame/text
+                    self.error_text_frame.grid(row=2, column=0, padx=20, pady=(0, 20))
+                    
+                    # Stop the entire project creation function.
+                    return
+
 
                 # Create a project data object
             project = data.Project(
                 name = input_text
             )
+
+                # Add the project to the list variable of projects
+            self.all_projects.append(project)
 
                 # Create the project button
             project_button = ui.ProjectButton(
@@ -238,8 +274,6 @@ class ProjectsView(ctk.CTkFrame):
                 self.current_projects_row += 1
                 self.current_projects_column = 0
             
-            # Set text to be nothing if a project was successfully created.
-            self.error_text.configure(text = "")
 
             # Set projects exists to true and show the window
             self.projects_exists = True
@@ -250,3 +284,14 @@ class ProjectsView(ctk.CTkFrame):
             self.no_projects_frame.grid_remove()
             # Show the "Remove projects button"
             self.button_remove_project.grid()
+
+
+
+
+
+
+
+
+
+
+

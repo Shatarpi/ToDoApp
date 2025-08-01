@@ -8,7 +8,6 @@ from todo_app.views.projects_view import ProjectsView
 from todo_app.views.tabs_view import TabsView
 
 
-
 # --- MAIN APPLICATION CLASS ---
 class App(ctk.CTk):
     """Main application class"""
