@@ -27,6 +27,9 @@ class ProjectsView(ctk.CTkFrame):
         # Create an empty list that will store all the project OBJECTS
         self.all_projects = []
 
+        # Create an empty list that will store all the project BUTTONS
+        self.all_project_buttons = []
+
         # Set start variables for placing projects in order
         self.current_projects_row = 0
         self.current_projects_column = 0
@@ -132,7 +135,7 @@ class ProjectsView(ctk.CTkFrame):
         self.button_remove_project = ui.SquareButton(
             master = self.add_remove_frame,
             text = "-",
-            # ADD COMMAND HERE
+            command = self. remove_project,
             theme = self.default_theme,
             border_color = "#6E2B2B",
         )
@@ -162,7 +165,7 @@ class ProjectsView(ctk.CTkFrame):
 
 # --- FUNCTIONS/METHODS ---
 
-    # Change the view/page
+    # CHANGE THE VIEW/PAGE
         # Function that just calls the function in main.py
     def set_view(self, to_view, project_data):
         self.master.set_view(to_view, project_data )
@@ -170,8 +173,6 @@ class ProjectsView(ctk.CTkFrame):
 
 
     # "ADD PROJECT" POPUP/DIALOG BOX
-
-    # Open the "Add project" popup/dialog window
     def open_add_project(self):
 
         dialog = ctk.CTkInputDialog(
@@ -216,7 +217,7 @@ class ProjectsView(ctk.CTkFrame):
             pass
 
         # Else if dialog is closed with OK, but project is missing name
-        elif input_text == "" or None:
+        elif input_text == "" or input_text is None:
             self.error_text.configure(text = "Project needs a name!")
 
             # Show the error frame/text
@@ -256,6 +257,9 @@ class ProjectsView(ctk.CTkFrame):
                 project_data = project # Send the data about the project to this button
             )
 
+            # Add the button to the list of buttons
+            self.all_project_buttons.append(project_button)
+
             # Add the button to the grid
             project_button.grid(
                 row = self.current_projects_row,
@@ -263,6 +267,8 @@ class ProjectsView(ctk.CTkFrame):
                 padx=20,
                 pady=(10, 10)
                 )
+            
+            
 
             # Increment up the counters
                 # If we are not currently on the last column, increment it
@@ -286,12 +292,118 @@ class ProjectsView(ctk.CTkFrame):
             self.button_remove_project.grid()
 
 
+    # "REMOVE PROJECT" POPUP
+    def remove_project(self):
+
+        def remove_confirmation(selected_project):
+
+            ui.ConfirmationPopup(
+                master = main,
+                thing_to_delete = f"project: '{selected_project.project_name}",
+                on_yes_click = lambda: on_yes(selected_project)
+            )
 
 
+        def on_yes(project):
+
+            # Find and destroy the GUI button in the main window
+                # Loop through a copy of the list
+            for button in self.all_project_buttons[:]:
+                
+                # If the data the button holds is the same as the project
+                if button.project_data == project:
+                    # Delete the UI element
+                    button.destroy()
+                    # Remove the button from the (original) list
+                    self.all_project_buttons.remove(button)
+                    break
+
+            # Remove the project object from the list of projects
+            self.all_projects.remove(project)
+
+            # Check if there are no more projects left.
+            if len(self.all_projects) == 0:
+                self.projects_exists = False
+                # Show the "No projects" frame/text
+                self.no_projects_frame.grid()
+                # Hide the grid of projects and the "Remove projects button"
+                self.projects_grid.grid_remove()
+                self.button_remove_project.grid_remove()
+
+            # Destroy the popup to close it
+            main.destroy()
 
 
+        # Create a top level/popup window
+        main = ctk.CTkToplevel(
+            master = self
+        )
+
+        main.title("My To-Do manager")
+
+        # Configure its grid
+        main.grid_columnconfigure(0, weight=1)
+        main.grid_rowconfigure(0, weight=1)
+
+        # Create the main frame that goes in the window
+        frame = ctk.CTkFrame(master = main, fg_color = "transparent")
+
+        # Place the frame in the window
+        frame.grid(row = 0, column = 0, sticky = "nsew", padx = 10, pady = 10)
+        
+        # Configure the new frames grid
+        frame.grid_columnconfigure(0, weight=1)
+
+        # Add a label to the top of the frame
+        label = ctk.CTkLabel(master = frame, text = "Which project to delete?")
+
+        label.grid(row = 0, column = 0, pady = 30, sticky = "ew")
+
+        # Set the first row a button/project will be on
+        row = 1
+
+        # For every project, create a button
+        for project in self.all_projects:
+            
+            button = ctk.CTkButton(
+                master = frame,
+                text = project.project_name,
+                fg_color = self.default_theme["accent"],
+                hover_color = "#be2c2c",
+                border_width = 1,
+                # NO COMMAND HERE
+                )
+            
+            # Since the command references the button itself, we need to assign the command after the button has been fully created.
+            button.configure(command=lambda p=project: remove_confirmation(p))
+
+            # Place it in the frame
+            button.grid(row=row, column = 0, pady = 10, padx = 50, sticky = "ew")
+
+            # Increment up the row counter
+            row +=1
+
+        # Position the dialog box
+            # Makes sure the dialogs contents are fully arranged and ready before doing anything else.
+        main.update_idletasks()
+
+            # Get cursor position
+        pointer_x = self.winfo_pointerx()
+        pointer_y = self.winfo_pointery()
+
+        # Offset popup window from cursor
+            # Manually figured out the size of the popup and hardcoded in offsets
+        pos_x = pointer_x - 175 # Remove half of width from pos x
+        pos_y = pointer_y - 100 # Remove half of height from pos y
+    
+
+            # Set the dialog position
+        main.geometry(f"+{pos_x}+{pos_y}")
+
+        # After 200 milliseconds, apply the icon to the window
+            # (Ctk applies its own after ~150ms so we have to wait until after that)
+        main.after(200, lambda: main.iconbitmap("D:/Projects/Programming/ToDoApp/src/todo_app/assets/icon_main.ico"))
 
 
-
-
-
+        # After 250 milliseconds, set focus to the popup window
+        main.after(250, lambda: main.focus())
