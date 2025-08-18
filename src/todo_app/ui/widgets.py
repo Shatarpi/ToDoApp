@@ -14,10 +14,7 @@ class ProjectButton(ctk.CTkButton):
     """
     The button that gets created whenever a project is created. Stores various other information such as project name, which tabs/categories it got etc.
     """
-    def __init__(self, master, theme, set_view, project_data, **kwargs):
-
-        # Store the incoming function
-        self.set_view = set_view
+    def __init__(self, master, theme, command, project_data, **kwargs):
 
         # Store the incoming project data so each button stores it's unique data
         self.project_data = project_data
@@ -29,7 +26,7 @@ class ProjectButton(ctk.CTkButton):
             "corner_radius": 15,
             "text": self.project_data.project_name,
             "font": ctk.CTkFont(size=16, weight="bold"),
-            "command": lambda: self.set_view("tabs", self.project_data),
+            "command": command,
             "fg_color": theme["accent"],
             "hover_color": theme["hover"],
             "text_color": theme["text"]
@@ -322,7 +319,7 @@ class NoTabsFrame(ctk.CTkFrame):
 
         # Configure the frame
         self.grid_rowconfigure(0, weight=1)
-        self.grid_rowconfigure(1, weight=0)
+        self.grid_rowconfigure(1, weight=1)
         self.grid_rowconfigure(2, weight=1)
 
         self.grid_columnconfigure(0, weight=1)
@@ -339,9 +336,8 @@ class NoTabsFrame(ctk.CTkFrame):
             
         )
 
-
         # Place it in the new frame
-        no_tabs_label.grid(row=1, column=1)
+        no_tabs_label.grid(row=1, column=1, sticky = "nsew")
 
 
 
@@ -409,7 +405,7 @@ class TabsBody(ctk.CTkFrame):
     def __init__ (self, master, theme, on_add_click, **kwargs):
 
         defaults = {
-            "height": 200,
+            #"height": 200,
             "width": 250,
             "fg_color": "transparent"
         }
@@ -421,19 +417,21 @@ class TabsBody(ctk.CTkFrame):
         super().__init__(master=master, **defaults)
 
          # Configure the grid
-        self.grid_rowconfigure(0, weight=1) 
+        self.grid_rowconfigure(0, weight=1)
         self.grid_rowconfigure(1, weight=0)
 
-        self.grid_columnconfigure(0, weight=1) 
+        self.grid_columnconfigure(0, weight=1)
+        self.grid_columnconfigure(1, weight=0)
+        self.grid_columnconfigure(2, weight=1)
 
         self.todo_frame = ctk.CTkScrollableFrame(
             master = self,
-            height = 200,
+            #height = 200,
             width = 250,
             fg_color = theme["main"]
         )
 
-        self.todo_frame.grid(row = 0, column = 0, sticky="nsew", padx = 0, pady = 0)
+        self.todo_frame.grid(row=0, column=0, columnspan=3, sticky="nsew", padx = 0, pady = 0)
 
         
 
@@ -447,7 +445,7 @@ class TabsBody(ctk.CTkFrame):
             theme = theme
         )
 
-        self.button_add.grid(row=1, column=0, pady=(20,0))
+        self.button_add.grid(row=1, column=1, pady=(20,0))
 
 
 
@@ -591,7 +589,7 @@ class TabsFooter (ctk.CTkFrame):
         self.button_add.grid(row=1, column=4, pady=0, padx=0)
         
         # Create the "remove" button
-        self.button_add = SquareButton(
+        self.button_remove = SquareButton(
             master = self,
             width = 40,
             height = 45,
@@ -612,10 +610,10 @@ class TabsFooter (ctk.CTkFrame):
     def show_ui(self, show):
         if show == True:
             self.theme_selector_frame.grid()
-            self.button_add.grid(row=1, column=5, pady=0, padx=10)
+            self.button_remove.grid(row=1, column=5, pady=0, padx=10)
         else:
             self.theme_selector_frame.grid_remove()
-            self.button_add.grid_remove()
+            self.button_remove.grid_remove()
 
 
     # Change the dropdown item (from e.g., "Red" to "Default")
@@ -629,8 +627,6 @@ class TabsFooter (ctk.CTkFrame):
 
         # Method/function for updating the theme
     def update_theme(self, new_theme):
-        self.button_back.update_theme(new_theme)
-        self.button_add.update_theme(new_theme)
         self.option_menu.configure(
             fg_color = new_theme["main"],
             button_color = new_theme["accent"],

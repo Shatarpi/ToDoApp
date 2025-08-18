@@ -5,7 +5,8 @@ import os
 import customtkinter as ctk
 sys.path.append(os.path.join(os.path.dirname(__file__), 'src'))
 from todo_app.views.projects_view import ProjectsView
-from todo_app.views.tabs_view import TabsView
+from todo_app.views.category_view import TabsView
+from todo_app.core import storage
 
 
 # --- MAIN APPLICATION CLASS ---
@@ -15,6 +16,10 @@ class App(ctk.CTk):
     def __init__(self):
         super().__init__()
 
+        loaded_data = storage.load_data()
+
+
+
         # --- DEFAULT WINDOW SETTINGS ---
 
         # Window title
@@ -23,7 +28,7 @@ class App(ctk.CTk):
         
         # Define the starting size of the main application
         app_width = 750
-        app_height = 550
+        app_height = 750
 
         # Use normal Tkinter to get the monitor size
         screen_width = self.winfo_screenwidth()
@@ -47,8 +52,11 @@ class App(ctk.CTk):
         self.views = {}
 
         # --- Projects view ---
-        # Create a variable that acts as the instance/object of the ProjectsView class. When variable is created/defined, so is an instance/object.
-        self.projects_view = ProjectsView(master=self) 
+            # Create a variable that acts as the instance/object of the ProjectsView class. When variable is created/defined, so is an instance/object.
+        self.projects_view = ProjectsView(
+            master=self,
+            loaded_data = loaded_data
+            )
 
         # Place the new view instance/object on the grid to make it visible
         self.projects_view.grid(row=0, column=0, sticky="nsew")

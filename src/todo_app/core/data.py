@@ -1,4 +1,8 @@
 
+'''
+These are the different objects that store data. E.g., the project class/object stores information about it's name and which categories it contains.
+'''
+
 
 # --- PROJECT ---
 class Project():

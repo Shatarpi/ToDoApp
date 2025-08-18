@@ -5,6 +5,7 @@ import customtkinter as ctk
 from todo_app.ui import widgets as ui
 from todo_app.ui import themes
 from todo_app.core import data as data
+from todo_app.core import storage
 
 # Import the main frame color for all frames
 from todo_app.ui.themes import MAIN_FRAME_COLOR
@@ -14,7 +15,7 @@ from todo_app.ui.themes import MAIN_FRAME_COLOR
 class ProjectsView(ctk.CTkFrame):
     """Main class"""
 
-    def __init__(self, master, **kwargs):
+    def __init__(self, master, loaded_data, **kwargs):
     # Self: When this/a ProjectClass 'object' is created/instanced, it will
     # automatically call the __init__ method and pass itself as the first and 
     # argument/self.
@@ -24,18 +25,31 @@ class ProjectsView(ctk.CTkFrame):
         # Get the settings for the default theme
         self.default_theme = themes.get_theme("Default")
 
-        # Create an empty list that will store all the project OBJECTS
-        self.all_projects = []
+
+        # Unpack the dictionary and create a 'project' object from it
+            # Create new list variable (self.all_projects[])
+            # Inside [] we create a project object (data.Project)
+            # which will hold the data that gets unpacked (**data)..
+            # .. for every data/item in the loaded_data list of dictionaries
+
+            # Basically a for loop inside the [], ie do this for every item in loaded_data
+        self.all_projects = [data.Project(**data) for data in loaded_data]
+
 
         # Create an empty list that will store all the project BUTTONS
         self.all_project_buttons = []
+
 
         # Set start variables for placing projects in order
         self.current_projects_row = 0
         self.current_projects_column = 0
 
         # Start value for checking if projects exist
-        self.projects_exists = False
+            # If the list constains projects
+        if self.all_projects:
+            self.projects_exists = True
+        else:
+            self.projects_exists = False
 
         defaults = {
             "fg_color": MAIN_FRAME_COLOR
@@ -44,7 +58,6 @@ class ProjectsView(ctk.CTkFrame):
         # Allow instantiation arguments to override the defaults
         defaults.update(kwargs)
 
-        # (Analogy: order the car chassi with the new specifications)
         super().__init__(master, **defaults)
 
         # Fix main grid configuration
@@ -103,7 +116,7 @@ class ProjectsView(ctk.CTkFrame):
         self.button_add_project = ui.SquareButton(
             master = self.add_remove_frame,
             text = "+",
-            command = self.open_add_project,
+            command = self.add_project,
             theme = self.default_theme,
             border_color = "#416E2B",
         )
@@ -130,7 +143,7 @@ class ProjectsView(ctk.CTkFrame):
         
 
 
-        # --- REMOVE PROJECTS BUTTON ---
+        # Remove projects button
             # Create the "remove project" button
         self.button_remove_project = ui.SquareButton(
             master = self.add_remove_frame,
@@ -144,36 +157,21 @@ class ProjectsView(ctk.CTkFrame):
         
 
 
-        # --- SHOW/HIDE THE CORRECT UI ELEMENTS AT LAUNCH ---
-
-        if self.projects_exists == False:
-            # Hide the grid of projects
-            self.projects_grid.grid_remove()
-            # Show the "No projects" frame/text
-            self.no_projects_frame.grid()
-            # Hide the "Remove projects button"
-            self.button_remove_project.grid_remove()
-        
-        else:
-            # Show the grid of projects
-            self.projects_grid.grid()
-            # Hide the "No projects" frame/text
-            self.no_projects_frame.grid_remove()
-            # Show the "Remove projects button"
-            self.button_remove_project.grid()
+        # Show/hide the correct UI elements at launch
+        self.update_ui()
 
 
-# --- FUNCTIONS/METHODS ---
+    # --- FUNCTIONS/METHODS ---
 
     # CHANGE THE VIEW/PAGE
         # Function that just calls the function in main.py
     def set_view(self, to_view, project_data):
-        self.master.set_view(to_view, project_data )
+        self.master.set_view(to_view, project_data)
 
 
 
     # "ADD PROJECT" POPUP/DIALOG BOX
-    def open_add_project(self):
+    def add_project(self):
 
         dialog = ctk.CTkInputDialog(
             title = "Add new project",
@@ -249,47 +247,7 @@ class ProjectsView(ctk.CTkFrame):
                 # Add the project to the list variable of projects
             self.all_projects.append(project)
 
-                # Create the project button
-            project_button = ui.ProjectButton(
-                master = self.projects_grid.projects_grid,
-                theme = self.default_theme,
-                set_view = lambda *args: self.set_view("tabs", project),
-                project_data = project # Send the data about the project to this button
-            )
-
-            # Add the button to the list of buttons
-            self.all_project_buttons.append(project_button)
-
-            # Add the button to the grid
-            project_button.grid(
-                row = self.current_projects_row,
-                column = self.current_projects_column,
-                padx=20,
-                pady=(10, 10)
-                )
-            
-            
-
-            # Increment up the counters
-                # If we are not currently on the last column, increment it
-            if self.current_projects_column < 2:
-                self.current_projects_column += 1
-
-                # If we are on the last column, increase to row counter and reset column counter
-            else:
-                self.current_projects_row += 1
-                self.current_projects_column = 0
-            
-
-            # Set projects exists to true and show the window
-            self.projects_exists = True
-
-            # Show the grid of projects
-            self.projects_grid.grid()
-            # Hide the "No projects" frame/text
-            self.no_projects_frame.grid_remove()
-            # Show the "Remove projects button"
-            self.button_remove_project.grid()
+            self.update_ui()
 
 
     # "REMOVE PROJECT" POPUP
@@ -306,29 +264,10 @@ class ProjectsView(ctk.CTkFrame):
 
         def on_yes(project):
 
-            # Find and destroy the GUI button in the main window
-                # Loop through a copy of the list
-            for button in self.all_project_buttons[:]:
-                
-                # If the data the button holds is the same as the project
-                if button.project_data == project:
-                    # Delete the UI element
-                    button.destroy()
-                    # Remove the button from the (original) list
-                    self.all_project_buttons.remove(button)
-                    break
-
-            # Remove the project object from the list of projects
+            # Remove the project from the list of projects
             self.all_projects.remove(project)
 
-            # Check if there are no more projects left.
-            if len(self.all_projects) == 0:
-                self.projects_exists = False
-                # Show the "No projects" frame/text
-                self.no_projects_frame.grid()
-                # Hide the grid of projects and the "Remove projects button"
-                self.projects_grid.grid_remove()
-                self.button_remove_project.grid_remove()
+            self.update_ui()
 
             # Destroy the popup to close it
             main.destroy()
@@ -407,3 +346,70 @@ class ProjectsView(ctk.CTkFrame):
 
         # After 250 milliseconds, set focus to the popup window
         main.after(250, lambda: main.focus())
+
+
+
+    # UDPATE / REFRESH THE UI
+    def update_ui(self):
+
+        # Delete every button
+        for button in self.all_project_buttons[:]: # Using duplicate list here
+            button.destroy()
+
+        # If list of projects contains projects
+        if self.all_projects:
+
+            # Show the grid of projects
+            self.projects_grid.grid()
+            # Hide the "No projects" frame/text
+            self.no_projects_frame.grid_remove()
+            # Show the "Remove projects button"
+            self.button_remove_project.grid()
+
+            # Reset counters
+            self.current_projects_row = 0
+            self.current_projects_column = 0
+
+            # Go through all of the projects
+            for project in self.all_projects:
+
+                # Create the project button
+                project_button = ui.ProjectButton(
+                    master = self.projects_grid.projects_grid,
+                    theme = self.default_theme,
+                    command = lambda p=project: self.set_view("tabs", p),
+                    project_data = project # Send the data about the project to this button
+                )
+
+                # Add the button to the list of buttons
+                self.all_project_buttons.append(project_button)
+
+                # Add the button to the grid
+                project_button.grid(
+                    row = self.current_projects_row,
+                    column = self.current_projects_column,
+                    padx=20,
+                    pady=(10, 10)
+                    )
+                
+                
+                # Increment up the counters
+                    # If we are not currently on the last column, increment it
+                if self.current_projects_column < 2:
+                    self.current_projects_column += 1
+
+                    # If we are on the last column, increase to row counter and reset column counter
+                else:
+                    self.current_projects_row += 1
+                    self.current_projects_column = 0
+
+        # If no projects exist
+        else:
+            # Hide the grid of projects
+            self.projects_grid.grid_remove()
+            # Show the "No projects" frame/text
+            self.no_projects_frame.grid()
+            # Hide the "Remove projects button"
+            self.button_remove_project.grid_remove()
+
+            
