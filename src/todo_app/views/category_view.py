@@ -5,6 +5,7 @@ import tkinter as tk
 from todo_app.ui import widgets as ui
 from todo_app.ui import themes
 from todo_app.core import data as data
+from todo_app.core.utils import resource_path
 
 # Import the main frame color for all frames
 from todo_app.ui.themes import MAIN_FRAME_COLOR
@@ -259,8 +260,6 @@ class TabsView(ctk.CTkFrame):
         # NO ACTIVE PROJECT - Hide everything, sort of.
         if self.active_project == None:
 
-            print("category_view.py - update_ui(): no active project")
-
             # Hide the top row of button/tabs
             self.tabs.grid_remove()
             # Hide UI elements in footer (theme selector, remove button etc.)
@@ -270,8 +269,6 @@ class TabsView(ctk.CTkFrame):
 
         # IF CATEGORIES DOES NOT EXIST
         elif not self.active_project.categories:
-
-            print("category_view.py - update_ui(): no categories exist")
 
             # Hide the top row of button/tabs
             self.tabs.grid_remove()
@@ -288,8 +285,6 @@ class TabsView(ctk.CTkFrame):
 
         # IF CATEGORIES EXIST
         else:
-
-            print("category_view.py - update_ui(): categories exist")
             
             # Add the tab buttons to the top row
                 # Initialize the counter for the tabs/buttons
@@ -316,8 +311,6 @@ class TabsView(ctk.CTkFrame):
                 # ACTIVE CATEGORY
                     # If category is the active category, and names match
                 if self.active_category and self.active_category == category:
-
-                    print(f"category_view.py - update_ui(): active category: {self.active_category}")
 
                     # Update the footer with the new settings
                     self.footer.update_theme(theme_settings)
@@ -520,7 +513,7 @@ class TabsView(ctk.CTkFrame):
 
         # After 200 milliseconds, apply the icon to the window
         # (Ctk applies its own after ~150ms so we have to wait until after that)
-        dialog.after(200, lambda: dialog.iconbitmap("D:/Projects/Programming/ToDoApp/src/todo_app/assets/icon_main.ico"))
+        dialog.after(200, lambda: dialog.iconbitmap(resource_path("src/todo_app/assets/icon_main.ico")))
 
         # Refresh UI to remove potential error text
         self.update_ui()
@@ -678,7 +671,7 @@ class TabsView(ctk.CTkFrame):
 
         # After 200 milliseconds, apply the icon to the window
         # (Ctk applies its own after ~150ms so we have to wait until after that)
-        dialog.after(200, lambda: dialog.iconbitmap("D:/Projects/Programming/ToDoApp/src/todo_app/assets/icon_main.ico"))
+        dialog.after(200, lambda: dialog.iconbitmap(resource_path("src/todo_app/assets/icon_main.ico")))
 
 
         # When popup/dialog is closed (Either OK, CANCEL or X)

@@ -7,6 +7,9 @@ sys.path.append(os.path.join(os.path.dirname(__file__), 'src'))
 from todo_app.views.projects_view import ProjectsView
 from todo_app.views.category_view import TabsView
 from todo_app.core import storage
+from todo_app.core.utils import resource_path
+
+
 
 
 # --- MAIN APPLICATION CLASS ---
@@ -23,7 +26,7 @@ class App(ctk.CTk):
         # --- DEFAULT WINDOW SETTINGS ---
 
         # Window title
-        self.iconbitmap("src/todo_app/assets/icon_main.ico")
+        self.iconbitmap(resource_path("src/todo_app/assets/icon_main.ico"))
         self.title("My To-Do manager")
         
         # Define the starting size of the main application
@@ -129,7 +132,7 @@ class App(ctk.CTk):
 
     # When the program closes (with X)
     def on_closing(self):
-        
+
         # Save the data
         self.save()
         

@@ -6,6 +6,7 @@ from todo_app.ui import widgets as ui
 from todo_app.ui import themes
 from todo_app.core import data as data_module
 from todo_app.core import storage
+from todo_app.core.utils import resource_path
 
 # Import the main frame color for all frames
 from todo_app.ui.themes import MAIN_FRAME_COLOR
@@ -200,7 +201,7 @@ class ProjectsView(ctk.CTkFrame):
 
         # After 200 milliseconds, apply the icon to the window
         # (Ctk applies its own after ~150ms so we have to wait until after that)
-        dialog.after(200, lambda: dialog.iconbitmap("D:/Projects/Programming/ToDoApp/src/todo_app/assets/icon_main.ico"))
+        dialog.after(200, lambda: dialog.iconbitmap(resource_path("src/todo_app/assets/icon_main.ico")))
 
 
         # Hide the error text/frame.
@@ -349,7 +350,7 @@ class ProjectsView(ctk.CTkFrame):
 
         # After 200 milliseconds, apply the icon to the window
             # (Ctk applies its own after ~150ms so we have to wait until after that)
-        main.after(200, lambda: main.iconbitmap("D:/Projects/Programming/ToDoApp/src/todo_app/assets/icon_main.ico"))
+        main.after(200, lambda: main.iconbitmap(resource_path("src/todo_app/assets/icon_main.ico")))
 
 
         # After 250 milliseconds, set focus to the popup window
