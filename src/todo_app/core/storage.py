@@ -7,8 +7,8 @@ import os
 import appdirs
 
 
-# Get and create path to C:\Users\[YourUsername]\AppData\Local\ToDoApp\[MyName]
-DATA_DIR = appdirs.user_data_dir("ToDoApp", "Jonathan")
+# Get and create path to C:\Users\[YourUsername]\AppData\Local\ToDoApp\
+DATA_DIR = appdirs.user_data_dir("ToDoApp")
 
 # Add "data.json" to the end of the path created above
 DATA_FILE = os.path.join(DATA_DIR, "data.json")

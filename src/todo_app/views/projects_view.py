@@ -4,7 +4,7 @@ import tkinter as tk
 import customtkinter as ctk
 from todo_app.ui import widgets as ui
 from todo_app.ui import themes
-from todo_app.core import data as data
+from todo_app.core import data as data_module
 from todo_app.core import storage
 
 # Import the main frame color for all frames
@@ -27,13 +27,13 @@ class ProjectsView(ctk.CTkFrame):
 
 
         # Unpack the dictionary and create a 'project' object from it
-            # Create new list variable (self.all_projects[])
+            # Create new list variable (self.all_projects = [])
             # Inside [] we create a project object (data.Project)
             # which will hold the data that gets unpacked (**data)..
             # .. for every data/item in the loaded_data list of dictionaries
 
             # Basically a for loop inside the [], ie do this for every item in loaded_data
-        self.all_projects = [data.Project(**data) for data in loaded_data]
+        self.all_projects = [data_module.Project(**item_data) for item_data in loaded_data]
 
 
         # Create an empty list that will store all the project BUTTONS
@@ -240,13 +240,17 @@ class ProjectsView(ctk.CTkFrame):
 
 
                 # Create a project data object
-            project = data.Project(
+            project = data_module.Project(
                 name = input_text
             )
 
                 # Add the project to the list variable of projects
             self.all_projects.append(project)
 
+            # Save all the data to file
+            self.master.save()
+
+            # Update the UI
             self.update_ui()
 
 
@@ -267,6 +271,10 @@ class ProjectsView(ctk.CTkFrame):
             # Remove the project from the list of projects
             self.all_projects.remove(project)
 
+            # Save all the data to file
+            self.master.save()
+
+            # Update the UI
             self.update_ui()
 
             # Destroy the popup to close it

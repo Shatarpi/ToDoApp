@@ -479,6 +479,9 @@ class TabsView(ctk.CTkFrame):
 
             # Change category as an easy way to make it "active" and get it to use the active colors
             self.change_category(self.active_category.category_name)
+
+            # Save all the data to file
+            self.master.save()
             
         # If there is no active category
         else:
@@ -567,6 +570,9 @@ class TabsView(ctk.CTkFrame):
             # Create the tab button and body that will hold to-do items
             self.create_category_components(category)
 
+            # Save all the data to file
+            self.master.save()
+
             # Update the UI so they are displayed
             self.update_ui()
             
@@ -635,6 +641,9 @@ class TabsView(ctk.CTkFrame):
                 # Change to the new category
                 self.change_category(new_category.category_name)
 
+            # Save all the data to file
+            self.master.save()
+
             # Update the UI
             self.update_ui()
 
@@ -699,6 +708,9 @@ class TabsView(ctk.CTkFrame):
             # Add new data item to active categories list of to-do's
             self.active_category.todo_items.append(data_item)
 
+            # Save all the data to file
+            self.master.save()
+
             # Update the UI to place/grid the new item
             self.update_ui()
 
@@ -725,5 +737,8 @@ class TabsView(ctk.CTkFrame):
         def delete_item(data, frame):
 
             self.active_category.todo_items.remove(data)
+
+            # Save all the data to file
+            self.master.save()
 
             frame.destroy()

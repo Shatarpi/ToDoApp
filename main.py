@@ -72,13 +72,38 @@ class App(ctk.CTk):
 
 
 
-
         # --- Initial view when launching the program ---
         self.set_view("projects", None)
 
 
+        # --- Define what happens when program is closed (with X)
+        self.protocol("WM_DELETE_WINDOW", self.on_closing)
+
+
+
+
 
     # --- FUNCTIONS / METHODS ---
+
+    def save(self):
+
+        # Get/store a list of all the projects
+        all_projects = self.projects_view.all_projects
+
+        # Initialize the list of dictionaries that will be saved out
+        save_dicts = []
+
+        # Go over all projects and create dictionaries of all of them.
+        # Calling the projects "to_dict" method in turn calls the category's "to_dict" method and so on, resulting in a top level dictionary that contains several layers of dictionaries.
+        for project in all_projects:
+            project_dict = project.to_dict()
+
+            save_dicts.append(project_dict)
+
+        # Save the list of dictionaries to the file
+        storage.save_data(save_dicts)
+
+
 
     # Function for toggling views/pages
     def set_view(self, view_name, project_data):
@@ -99,6 +124,17 @@ class App(ctk.CTk):
         # Else if view is not found, print error
         else:
             print(f"ERROR: View '{view_name}' not found")
+
+
+
+    # When the program closes (with X)
+    def on_closing(self):
+        
+        # Save the data
+        self.save()
+        
+        # Actually destroy the window
+        self.destroy()
 
 
 

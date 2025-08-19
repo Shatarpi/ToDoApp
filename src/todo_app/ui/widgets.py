@@ -405,7 +405,6 @@ class TabsBody(ctk.CTkFrame):
     def __init__ (self, master, theme, on_add_click, **kwargs):
 
         defaults = {
-            #"height": 200,
             "width": 250,
             "fg_color": "transparent"
         }
