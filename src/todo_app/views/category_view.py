@@ -1,7 +1,9 @@
+# A portion of this code was written with the help of an AI tool to help with debugging and explaining/teaching new concepts while the logic and structure were my own.
+
 """The tabs view module that shows the tabs/categories and to-do items in each project"""
 
-import customtkinter as ctk
 import tkinter as tk
+import customtkinter as ctk
 from todo_app.ui import widgets as ui
 from todo_app.ui import themes
 from todo_app.core import data as data

@@ -1,8 +1,9 @@
+# A portion of this code was written with the help of an AI tool to help with debugging and explaining/teaching new concepts while the logic and structure were my own.
+
 
 '''
 These are the different objects that store data. E.g., the project class/object stores information about it's name and which categories it contains.
 '''
-
 
 # --- PROJECT ---
 class Project():

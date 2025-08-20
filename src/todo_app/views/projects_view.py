@@ -1,11 +1,11 @@
+# A portion of this code was written with the help of an AI tool to help with debugging and explaining/teaching new concepts while the logic and structure were my own.
+
 """The projects view module that lists the available projects"""
 
-import tkinter as tk
 import customtkinter as ctk
 from todo_app.ui import widgets as ui
 from todo_app.ui import themes
 from todo_app.core import data as data_module
-from todo_app.core import storage
 from todo_app.core.utils import resource_path
 
 # Import the main frame color for all frames

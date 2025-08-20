@@ -1,3 +1,4 @@
+# All of the below, except comments, was made with AI (all while thorougly explaining what each step does) as it was a new but required concept and library for the app to work.
 
 import sys
 import os

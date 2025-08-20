@@ -1,5 +1,6 @@
+# A portion of this code was written with the help of an AI tool to help with debugging and explaining/teaching new concepts while the logic and structure were my own.
+
 import customtkinter as ctk
-from todo_app.ui import themes
 
 DEFAULT_THEME = "default"
 

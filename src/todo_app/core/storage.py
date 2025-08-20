@@ -1,3 +1,6 @@
+# All of the below, except comments, was made with AI (all while thorougly explaining what each step does) as it was a new but required concept and library for the app to work.
+
+
 '''
 This handles the import/export of the data, meaning it saves the existing projects/categories/to-do items so that it doesn't have to be recreated everytime the program is launched.
 '''
@@ -25,8 +28,6 @@ def save_data(all_projects_data):
     with open(DATA_FILE, "w") as f:
         # Write json style text, using infor stored in all_projects_data, to the object f
         json.dump(all_projects_data, f, indent=4)
-
-
 
 
 
